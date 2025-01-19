@@ -2,8 +2,8 @@
 /*
 Plugin Name: Banner Exchange System
 Description: Sistema de intercambio de banners para WordPress.
-Version: 1.0
-Author: Tu Nombre
+Version: 2.0
+Author: webanner
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
