@@ -2,22 +2,75 @@
 
 // Mostrar el formulario de envío de banner
 function bes_display_submit_banner_form() {
+    if ( ! is_user_logged_in() ) {
+        return;
+    }
+
     if ( isset( $_POST['bes_submit'] ) && check_admin_referer('bes_submit_banner_nonce', 'bes_nonce') ) {
         bes_handle_banner_submission();
     }
     
     ob_start();
     ?>
-    <form method="post" enctype="multipart/form-data">
-        <?php wp_nonce_field('bes_submit_banner_nonce', 'bes_nonce'); ?>
-        <label for="banner_url">URL del Banner:</label>
-        <input type="text" name="banner_url" id="banner_url" required>
-        
-        <label for="target_url">URL de Destino:</label>
-        <input type="url" name="target_url" id="target_url" required>
-        
-        <input type="submit" name="bes_submit" value="Enviar Banner">
-    </form>
+    <style>
+        .bes-submit-banner-form th, .bes-submit-banner-form td {
+            padding: 10px;
+            text-align: left;
+            border: none;
+        }
+        .bes-submit-banner-form input[type="text"],
+        .bes-submit-banner-form input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            margin: 0;
+        }
+        .bes-submit-banner-form input[type="submit"] {
+            background: #0073aa;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        .bes-submit-banner-form input[type="submit"]:hover {
+            background: #005177;
+        }
+        .bes-warning {
+            background: #fbf9d8;
+            border: 1px solid #817900;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            font-family: 'Arial', sans-serif;
+            align-items: center;
+        }
+        .bes-warning-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+    </style>
+    <div class="bes-submit-banner-form">
+        <div class="bes-warning">
+            
+         <p>Al enviar tu banner, aceptas que nuestro equipo revisará tanto el dominio como el diseño. Solo se aceptarán banners profesionales, sin elementos agresivos, intrusivos o de baja calidad. No se admitirán GIFs redundantes, vectores de mala resolución ni colores chillones.  <a href="/enviar-banner">⚠ Revisa nuestras políticas</a>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            <?php wp_nonce_field('bes_submit_banner_nonce', 'bes_nonce'); ?>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="banner_url" id="banner_url" placeholder="URL de Imagen" required></td>
+                        <td><input type="url" name="target_url" id="target_url" placeholder="URL de Campaña" required></td>
+                        <td><input type="submit" name="bes_submit" value="Enviar Banner"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
     <?php
     return ob_get_clean();
 }
@@ -35,6 +88,19 @@ function bes_handle_banner_submission() {
     $banner_url = sanitize_text_field( $_POST['banner_url'] );
     $target_url = esc_url( $_POST['target_url'] );
 
+    // Check if the banner already exists
+    $existing_banner = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_name WHERE user_id = %d AND banner_url = %s",
+            $user_id, $banner_url
+        )
+    );
+
+    if ($existing_banner > 0) {
+        echo '<p>Duplicate banner submission detected. Please check your banners.</p>';
+        return;
+    }
+
     $wpdb->insert(
         $table_name,
         [
@@ -49,6 +115,10 @@ function bes_handle_banner_submission() {
     );
 
     echo '<p>Banner enviado correctamente. Espera la aprobación del administrador.</p>';
+
+    // Redirect to prevent resubmission on refresh
+    wp_redirect( add_query_arg('submitted', 'true', wp_get_referer()) );
+    exit;
 }
 
 // Rastrear impresiones de banner
