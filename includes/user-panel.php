@@ -18,9 +18,8 @@ function bes_display_user_statistics() {
     ob_start();
     ?>
     <div class="bes-user-panel">
-        <h2>Estadísticas de tus Campañas</h2>
         <div class="bes-info-box">
-            <p>En nuestro sistema, cada 1000 impresiones de tu banner generan 1 crédito, y cada clic en tu banner genera 20 créditos. Puedes usar estos créditos para obtener más impresiones para tus banners.</p>
+            <p>En nuestro sistema, cada impresión de tu banner te otorga 1 crédito, mientras que cada clic genera 20 créditos. Estos créditos se convierten automáticamente en más impresiones y clics para tus banners, asegurando un intercambio justo y optimizado para maximizar tu visibilidad. ¡Cuantos más créditos acumules, mayor será el alcance de tu campaña! </p>
         </div>
         <div class="bes-card-container">
             <?php foreach ($banners as $index => $banner): ?>
@@ -30,7 +29,7 @@ function bes_display_user_statistics() {
                 
                 <div class="bes-card">
                     <div class="bes-card-header">
-                        <h3>ID: <span class="banner-id"><?php echo $banner->id; ?></span></h3>
+                        <h3>ID CAMPAÑA: <span class="banner-id"><?php echo $banner->id; ?></span></h3>
                         <img src="<?php echo esc_url($banner->banner_url); ?>" class="banner-image" alt="Banner">
                     </div>
                     <div class="bes-card-body">
@@ -69,9 +68,7 @@ function bes_display_user_statistics() {
         .bes-user-panel {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            padding: 0px;
             border-radius: 8px;
         }
         .bes-user-panel h2 {
